@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdbool.h>
 #include "heisstyring.h"
 #include "elev.h"
 #include "ko.h"
