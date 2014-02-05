@@ -13,4 +13,6 @@ bool finnestOrdreInniHeis();
 
 void settLys();
 
+bool erKoTom();
+
 #endif KO_H

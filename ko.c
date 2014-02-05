@@ -44,57 +44,37 @@ int hentNesteOrdre(int etasje, bool opp)
 	{
 		for(int i = etasje; i < ANTALL_ETASJER; i++)
 		{
-			if(bestillingOpp[i] == true)
-			{
+			if(bestillingOpp[i] || bestillingInne[i])
 				return i;
-			}
 		}
 
 	}
 
-	else if(opp == false)
+	else
 	{
-		for(int j = etasje; j > 0; j--)
+		for(int j = etasje; j >= 0; j--)
 		{
-			if(bestillingNed[j] == true)
-			{
+			if(bestillingNed[j] || bestillingInne[i])
 				return j;
-			}
 		}
 	}
 
-	return 0;
+	return -1;
 }
 
 void leggTilOrdre(int etasje, bool inne, bool opp)
 {
-	if(inne == true && opp == true)
-	{
+	if(inne == true)
 		bestillingInne[etasje] = true;
-		bestillingOpp[etasje] = true;
-	}
-	
-	else if(inne == true && opp == false)
-	{
-		bestillingInne[etasje] = true;
-		bestillingNed[etasje] = true;
-	}
 	
 	else if(inne == false && opp == true)
-	{
-		bestillingInne[etasje] = false;
 		bestillingOpp[etasje] = true;
-	}
 	
 	else if(inne == false && opp == false)
-	{
-		bestillingInne[etasje] = false;
 		bestillingNed[etasje] = true;
-	}
 
 	settLys();
-	//nyOrdre();
-	//nyOrdreTomKo();
+	nyOrdre();
 }
 
 bool finnestOrdreInniHeis()
@@ -102,9 +82,7 @@ bool finnestOrdreInniHeis()
 	for(int i = 0; i < ANTALL_ETASJER; i++)
 	{
 		if(bestillingInne[i] == true)
-		{
 			return true;
-		}
 	}
 	return false;
 }
@@ -119,4 +97,13 @@ void settLys()
 		
 		elev_set_button_lamp(BUTTON_CALL_DOWN, i, bestillingNed[i]);
 	}
+}
+
+bool erKoTom(){
+	for(int i = 0; i < ANTALL_ETASJER; i++)
+	{
+		if(bestillingInne[i] || bestillingOpp[i] || bestillingNed[i])
+			return false;
+	}
+	return true;
 }
