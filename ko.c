@@ -54,7 +54,7 @@ int hentNesteOrdre(int etasje, bool opp)
 	{
 		for(int j = etasje; j >= 0; j--)
 		{
-			if(bestillingNed[j] || bestillingInne[i])
+			if(bestillingNed[j] || bestillingInne[j])
 				return j;
 		}
 	}

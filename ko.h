@@ -15,4 +15,4 @@ void settLys();
 
 bool erKoTom();
 
-#endif KO_H
+#endif
