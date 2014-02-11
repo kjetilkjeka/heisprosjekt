@@ -1,6 +1,8 @@
 #ifndef KO_H
 #define KO_H
 
+#include <stdbool.h>
+
 void slettAlleOrdre();
 
 void slettOrdre(int etasje, bool opp);

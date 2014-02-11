@@ -92,10 +92,12 @@ void settLys()
 	for(int i = 0; i < ANTALL_ETASJER; i++)
 	{
 		elev_set_button_lamp(BUTTON_COMMAND, i, bestillingInne[i]);
-
-		elev_set_button_lamp(BUTTON_CALL_UP, i, bestillingOpp[i]);
 		
-		elev_set_button_lamp(BUTTON_CALL_DOWN, i, bestillingNed[i]);
+		if(i != 3)
+			elev_set_button_lamp(BUTTON_CALL_UP, i, bestillingOpp[i]);
+		
+		if(i !=0)
+			elev_set_button_lamp(BUTTON_CALL_DOWN, i, bestillingNed[i]);
 	}
 }
 
