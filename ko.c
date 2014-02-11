@@ -47,7 +47,6 @@ int hentNesteOrdre(int etasje, bool opp)
 			if(bestillingOpp[i] || bestillingInne[i])
 				return i;
 		}
-
 	}
 
 	else
