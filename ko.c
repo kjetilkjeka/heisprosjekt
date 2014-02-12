@@ -47,14 +47,38 @@ int hentNesteOrdre(int etasje, bool opp)
 			if(bestillingOpp[i] || bestillingInne[i])
 				return i;
 		}
+
+		for(int j = etasje; j < ANTALL_ETASJER; j++)
+		{
+			if(bestillingNed[j])
+					return j;
+		}
+
+		for(int k = etasje; k >= 0; k--)
+		{
+			if(bestillingNed[k] || bestillingOpp[k] || bestillingInne[k])
+				return k;
+		}
 	}
 
 	else
 	{
-		for(int j = etasje; j >= 0; j--)
+		for(int a = etasje; a >= 0; a--)
 		{
-			if(bestillingNed[j] || bestillingInne[j])
-				return j;
+			if(bestillingNed[a] || bestillingInne[a])
+				return a;
+		}
+
+		for(int b = etasje; b >= 0; b--)
+		{
+			if(bestillingOpp[b])
+				return b;
+		}
+
+		for(int c = etasje; c < ANTALL_ETASJER; c++)
+		{
+			if(bestillingNed[c] || bestillingOpp[c] || bestillingInne[c])
+				return c;
 		}
 	}
 
