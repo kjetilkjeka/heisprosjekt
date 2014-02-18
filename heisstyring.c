@@ -197,3 +197,33 @@ void foo(event_t event)
     
     }
 }
+
+void etasjeAnkommet(int etasje)
+{
+    foo(ETASJE_ANKOMMET);
+}
+
+void nyOrdreTomKo()
+{
+    foo(NY_ORDRE_TOM_KO);
+}
+
+void nyOrdre()
+{
+    foo(NY_ORDRE);
+}
+
+void obstruksjonPa()
+{
+    foo(OBSTRUKSJON_PA);
+}
+
+void obstruksjonAv()
+{
+    foo(OBSTRUKSJON_AV);
+}
+
+void nodStopp()
+{
+    foo(NOD_STOPP);
+}
