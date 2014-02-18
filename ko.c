@@ -34,6 +34,14 @@ void slettOrdre(int etasje, bool opp)
 	{
 		bestillingNed[etasje] = false;
 	}
+	
+
+	// litt dirty sjekk om det finnest bedre måte senere
+	if(etasje == ANTALL_ETASJER -1)
+	  bestillingNed[etasje] = false;
+
+	if(etasje == 0)
+	  bestillingOpp[etasje] = false;
 
 	settLys();
 }
@@ -50,8 +58,8 @@ int hentNesteOrdre(int etasje, bool opp)
 
 		for(int j = etasje; j < ANTALL_ETASJER; j++)
 		{
-			if(bestillingNed[j])
-					return j;
+		  if(bestillingNed[j])
+		    return j;
 		}
 
 		for(int k = etasje; k >= 0; k--)

@@ -1,8 +1,8 @@
 # Compiler flags go here.
-CFLAGS = -std=c99 -g -Wall -O2 -I . -MMD
+CFLAGS = -g -std=c99 -Wall -O2 -I . -MMD
 
 # Linker flags go here.
-LDFLAGS = -lm -lpthread -lcomedi -g
+LDFLAGS = -lpthread -lcomedi -g -lm
 
 # list of sources
 ELEVSRC = elev.c io.c main.c ko.c heisstyring.c
@@ -21,7 +21,7 @@ ELEVOBJ = $(ELEVSRC:.c=.o)
 
 # rule to link the program
 $(TARGET): $(ELEVOBJ)
-	gcc $(LDFLAGS) $^ -o $@
+	gcc $^ -o $@ $(LDFLAGS)
 
 # Compile: create object files from C source files.
 %.o : %.c
