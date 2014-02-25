@@ -1,11 +1,11 @@
 # Compiler flags go here.
-CFLAGS = -g -std=c99 -Wall -O2 -I . -MMD
+CFLAGS = -g -std=c99 -O2 -I . -MMD
 
 # Linker flags go here.
 LDFLAGS = -lpthread -lcomedi -g -lm
 
 # list of sources
-ELEVSRC = elev.c io.c main.c ko.c heisstyring.c
+ELEVSRC = elev.c io.c main.c ko.c heisstyring.c timer.c
 
 # program executable file name.
 TARGET = heis

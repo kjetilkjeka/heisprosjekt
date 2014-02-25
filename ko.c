@@ -35,8 +35,6 @@ void slettOrdre(int etasje, bool opp)
 		bestillingNed[etasje] = false;
 	}
 	
-
-	// litt dirty sjekk om det finnest bedre måte senere
 	if(etasje == ANTALL_ETASJER -1)
 	  bestillingNed[etasje] = false;
 
@@ -50,10 +48,13 @@ int hentNesteOrdre(int etasje, bool opp)
 {
 	if(opp == true)
 	{
+	        if(etasje == ANTALL_ETASJER-2 && !bestillingOpp[ANTALL_ETASJER - 2] && opp && bestillingNed[ANTALL_ETASJER-1]) // sjekk om det finnest bedre metode
+	                return ANTALL_ETASJER-1;
+	  
 		for(int i = etasje; i < ANTALL_ETASJER; i++)
 		{
-			if(bestillingOpp[i] || bestillingInne[i])
-				return i;
+		  if(bestillingOpp[i] || bestillingInne[i])
+		    return i;
 		}
 
 		for(int j = etasje; j < ANTALL_ETASJER; j++)
@@ -71,6 +72,9 @@ int hentNesteOrdre(int etasje, bool opp)
 
 	else
 	{
+	        if(etasje == 1 && !bestillingNed[1] && !opp && bestillingOpp[0])
+		        return 0;
+
 		for(int a = etasje; a >= 0; a--)
 		{
 			if(bestillingNed[a] || bestillingInne[a])

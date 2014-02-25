@@ -6,10 +6,10 @@
 #include <stdbool.h>
 #include "ko.h"
 #include "heisstyring.h"
-#include <time.h>
+#include "timer.h"
 
-clock_t startTime = 0;
-bool timedOut = true;
+bool obstruksjon = false;
+bool stopp = false;
 
 int main()
 {
@@ -22,7 +22,6 @@ int main()
 
     int forgje = 0;
     
-
     printf("Press STOP button to stop elevator and exit program.\n");
     slettAlleOrdre();
     elev_set_speed(0);    
@@ -44,7 +43,6 @@ int main()
 	}
 
       int etasje = elev_get_floor_sensor_signal();
-
   
       if (etasje != -1 && etasje != forgje)
 	{
@@ -53,26 +51,30 @@ int main()
 	  forgje = etasje;
 	}
 
-      clock_t time = clock();
-      if(time - startTime > 3000000 && !timedOut)
-	{
-	  timeOut();
-	  timedOut = true;
-	  printf("timed out bitches!\n\r");
-	}
+      // poll timer
+      if(harTimetUt())
+	timeOut();
 
       
-    // obstruksjon og nødstopp
+      if(elev_get_obstruction_signal() != obstruksjon)
+	{
+	  forgje = -1;
+	  obstruksjon = elev_get_obstruction_signal();
+	  if(obstruksjon)
+	    obstruksjonPa();
+	  else
+	    obstruksjonAv();
+	}
 
+      if(elev_get_stop_signal() != stopp)
+	{
+	  stopp = elev_get_stop_signal();
+	  forgje = -1;
+	  if(stopp)
+	    nodStopp();
+	}
     }
-
 
     return 0;
 }
 
-void startTimer()
-{
-  startTime = clock();
-  timedOut = false;
-  
-}
