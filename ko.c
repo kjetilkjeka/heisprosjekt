@@ -48,49 +48,44 @@ int hentNesteOrdre(int etasje, bool opp)
 {
 	if(opp == true)
 	{
-	        if(etasje == ANTALL_ETASJER-2 && !bestillingOpp[ANTALL_ETASJER - 2] && opp && bestillingNed[ANTALL_ETASJER-1]) // sjekk om det finnest bedre metode
-	                return ANTALL_ETASJER-1;
-	  
+	        
 		for(int i = etasje; i < ANTALL_ETASJER; i++)
 		{
 		  if(bestillingOpp[i] || bestillingInne[i])
 		    return i;
 		}
 
-		for(int j = etasje; j < ANTALL_ETASJER; j++)
+		for(int i = ANTALL_ETASJER-1; i >= 0; i--)
 		{
-		  if(bestillingNed[j])
-		    return j;
+		  if(bestillingNed[i] || bestillingInne[i])
+		    return i;
 		}
 
-		for(int k = etasje; k >= 0; k--)
+		for(int i = 0; i < etasje; i++)
 		{
-			if(bestillingNed[k] || bestillingOpp[k] || bestillingInne[k])
-				return k;
+			if(bestillingOpp[i])
+				return i;
 		}
 	}
 
 	else
 	{
-	        if(etasje == 1 && !bestillingNed[1] && !opp && bestillingOpp[0])
-		        return 0;
-
-		for(int a = etasje; a >= 0; a--)
+	        for(int i = etasje; i >= 0; i--)
 		{
-			if(bestillingNed[a] || bestillingInne[a])
-				return a;
+			if(bestillingNed[i] || bestillingInne[i])
+				return i;
 		}
 
-		for(int b = etasje; b >= 0; b--)
+		for(int i = 0; i < ANTALL_ETASJER; i++)
 		{
-			if(bestillingOpp[b])
-				return b;
+			if(bestillingOpp[i] || bestillingInne[i])
+				return i;
 		}
 
-		for(int c = etasje; c < ANTALL_ETASJER; c++)
+		for(int i = ANTALL_ETASJER; i >= etasje; i--)
 		{
-			if(bestillingNed[c] || bestillingOpp[c] || bestillingInne[c])
-				return c;
+			if(bestillingNed[i])
+				return i;
 		}
 	}
 
@@ -136,11 +131,3 @@ void settLys()
 	}
 }
 
-bool erKoTom(){
-	for(int i = 0; i < ANTALL_ETASJER; i++)
-	{
-		if(bestillingInne[i] || bestillingOpp[i] || bestillingNed[i])
-			return false;
-	}
-	return true;
-}

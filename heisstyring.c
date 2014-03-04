@@ -4,14 +4,14 @@
 
 typedef enum
 {
-  INIT,
-  IDLE,
-  BEVEGER,
-  KLAR,
-  OBSTRUKSJON,
-  APNE_DORER,
-  NODSTOPP,
-  OBSTRUKSJON_STOPP
+    INIT, //0
+    IDLE, //1
+    BEVEGER, //2
+    KLAR,//3
+    OBSTRUKSJON, //4
+    APNE_DORER, //5
+    NODSTOPP, //6
+    OBSTRUKSJON_STOPP //7
 } tilstand_t;
 
 typedef enum

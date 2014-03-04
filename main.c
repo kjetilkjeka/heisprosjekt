@@ -27,6 +27,13 @@ int main()
     elev_set_speed(0);    
     initHeisstyring();
 
+    bool forgjeStopp;
+    bool forgjeObstruct;
+    bool forgjeOpp[4];
+    bool forgjeInn[4];
+    bool forgjeNed[4];
+
+
     while (1) {
       // poll buttons
       for(int i = 0; i < N_FLOORS; i++) // poller masse, fix
