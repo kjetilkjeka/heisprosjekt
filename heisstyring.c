@@ -29,302 +29,257 @@ tilstand_t tilstand1 = INIT;
 tilstand_t tilstand2 = KLAR;
 bool opp = true;
 int etasje = 0;
-bool apen = 0;
 
-void foo1(event_t event)
+void tilstandsMaskin1(event_t event)
 {
+    if(tilstand2 != KLAR)
+	return;
+    
     switch(tilstand1)
-    {      
+    {      	
     case(INIT):
-      initState(event);
-      break;
-
-    case(IDLE):
-      idleState(event);
-      break;
-
-    case(BEVEGER):
-      bevegerState(event);
-      break;
-
-    case(APNE_DORER):
-      apneState(event);
-      break;
-    }
-
-    elev_set_door_open_lamp(apen);
-
-
-    printf("tilstand1 er: %d \n\r", tilstand1);
-    printf("event er: %d \n\r", event);
-
-}
-
-void foo2(event_t event)
-{
-  switch(tilstand2)
-    {
-    case(KLAR):
-      klarState(event);
-      break;
-
-    case(OBSTRUKSJON):
-      obstruksjonState(event);
-      break;
-    	
-    case(NODSTOPP):
-      stoppState(event);
-      break;
-	
-    case(OBSTRUKSJON_STOPP):
-      obstruksjonStoppState(event);
-      break;
-    }
-    
-   
-    
-    printf("tilstand2 er: %d \n\r", tilstand2);
-    printf("event er: %d \n\r", event);
-}
-
-void initState(event_t event)
-{
-      switch(event)
+	switch(event)
 	{
 	case(ETASJE_ANKOMMET):
-	  elev_set_speed(0);
-	  etasje = elev_get_floor_sensor_signal();
-	  slettAlleOrdre();
-	  tilstand1 = IDLE;
-	  break;
+	    slettAlleOrdre();
+	    idleEntry();
+	    break;
 	}
-}
-
-void idleState(event_t event)
-{
+	break;
+	
+    case(IDLE):
 	switch(event)
 	{
 	case(NY_ORDRE):
 	    if(etasje == hentNesteOrdre(etasje, opp))
 	    {
-	      slettOrdre(etasje, opp);
-	      apen = true;
-	      tilstand1 = APNE_DORER;
-	      startTimer();
-	    } else {
-		tilstand1 = BEVEGER;
+		dorerEntry();
+	    } else 
+	    {	
 		bevegerEntry();
 	    }
 	    break;	
 	}
+	break;
+	
+    case(BEVEGER):
+	switch(event)
+	{
+	case(ETASJE_ANKOMMET):	
+	    if(hentNesteOrdre(etasje, opp) == etasje)
+	    {
+		dorerEntry();
+	    }
+	}
+	break;
+	
+    case(APNE_DORER):
+	
+	switch(event)
+	{
+	case(TIME_OUT):
+	    if(hentNesteOrdre(etasje, opp) == -1)
+	    {
+		idleEntry();
+	    } else if(hentNesteOrdre(etasje, opp) == etasje) 
+	    {	
+		slettOrdre(etasje, true);
+		slettOrdre(etasje, false);
+		dorerEntry();
+	    } else 
+	    {
+		bevegerEntry();
+	    }
+	    
+	    break;
+	case(NY_ORDRE):
+	    if(hentNesteOrdre(etasje, opp) == etasje)
+	    {
+		dorerEntry();
+	    }
+	}	
+	break;
+    }
 }
 
+void tilstandsMaskin2(event_t event)
+{
+    switch(tilstand2)
+    {
+    case(KLAR):
+	switch(event)
+	{
+	case(NOD_STOPP):	
+	    nodstopEntry();
+	    break;
+	case(OBSTRUKSJON_PA):
+	    obstruksjonEntry();
+	    break;
+	}
+	break;
+	
+    case(OBSTRUKSJON):
+	switch(event)
+	{	
+	case(NOD_STOPP):
+	    obstruksjonStoppEntry();
+	    break;
+	    
+	case(OBSTRUKSJON_AV):
+	    klarEntry(); 
+	}
+	break;
+    	
+    case(NODSTOPP):
+	switch(event)
+	{
+	case(NY_ORDRE):	
+	    if(finnestOrdreInniHeis() && !elev_get_stop_signal())
+	    {
+		klarEntry();
+	    } else 
+	    {
+		nodstopEntry();
+	    }
+	    break;
+	case(OBSTRUKSJON_PA):
+	    obstruksjonStoppEntry();
+	}
+	break;
+	
+    case(OBSTRUKSJON_STOPP):
+	switch(event)
+	{
+	case(NY_ORDRE):
+	    
+	    if(finnestOrdreInniHeis() && !elev_get_stop_signal())
+		obstruksjonEntry();
+	    else
+		obstruksjonStoppEntry();
+	    break;
+	    
+	case(OBSTRUKSJON_AV):
+	    nodstopEntry();	
+	}
+	
+	if(tilstand2 != NODSTOPP && tilstand2 != OBSTRUKSJON_STOPP)
+	    elev_set_stop_lamp(false);
+	
+	break;
+    }    
+}
+
+void idleEntry()
+{
+    elev_set_door_open_lamp(false);
+    elev_set_speed(0);
+    etasje = elev_get_floor_sensor_signal();
+    tilstand1 = IDLE;
+}
+
+void dorerEntry()
+{
+    elev_set_door_open_lamp(true);
+    elev_set_speed(0);
+    slettOrdre(etasje, opp);
+    startTimer();
+    tilstand1 = APNE_DORER;
+}
 
 void klarEntry()
 {
-  if(tilstand1 == BEVEGER)
-    bevegerEntry();
-  if(tilstand1 == APNE_DORER)
-    startTimer();
+    elev_set_stop_lamp(false);
+    if(tilstand1 == BEVEGER)
+	bevegerEntry();
+    if(tilstand1 == APNE_DORER)
+	startTimer();
+    tilstand2 = KLAR;
 }
 
-void klarState(event_t event)
+void nodstopEntry()
 {
-  switch(event)
-    {
-    case(NOD_STOPP):	
-      elev_set_speed(0);
-      tilstand2 = NODSTOPP;
-      break;
-    case(OBSTRUKSJON_PA):
-      elev_set_speed(0);
-      tilstand2 = OBSTRUKSJON;
-      break;
-    }
+    elev_set_stop_lamp(true);
+    slettAlleOrdre();
+    elev_set_speed(0);
+    tilstand2 = NODSTOPP;
+}
+
+void obstruksjonEntry()
+{
+    elev_set_stop_lamp(false);
+    elev_set_speed(0);
+    tilstand2 = OBSTRUKSJON;
 }
 
 void bevegerEntry()
 {
-  int neste = hentNesteOrdre(etasje, opp);
-  printf("neste ordre er: %d\r\n", neste);
-  
-  if(neste == etasje) // dette har med obstruksjon å gjøre
+    elev_set_door_open_lamp(false);
+    int neste = hentNesteOrdre(etasje, opp);
+    
+    if(neste == etasje)
     {
-      if(opp)
+	if(opp)
 	{
-	  opp = false;
-	  elev_set_speed(-300);
+	    opp = false;
+	    elev_set_speed(-300);
 	} else
 	{
-	  opp = true;
-	  elev_set_speed(300);
+	    opp = true;
+	    elev_set_speed(300);
 	}
     } else if(neste > etasje)
     {
-      elev_set_speed(300);
-      opp = true;
+	elev_set_speed(300);
+	opp = true;
     } else
     {
-      elev_set_speed(-300);
-      opp = false;
+	elev_set_speed(-300);
+	opp = false;
     }
+    
+    tilstand1 = BEVEGER;
 }
 
-      
-void bevegerState(event_t event)
-{	
-	switch(event)
-	{
-	case(ETASJE_ANKOMMET):	
-	  if(hentNesteOrdre(etasje, opp) == etasje)
-	    {
-	      slettOrdre(etasje, opp);
-	      apen = true;
-	      tilstand1 = APNE_DORER;
-	      startTimer();
-	    }
-	}
-
-	if(tilstand1 != BEVEGER)
-	    elev_set_speed(0);
-}
-
-void obstruksjonState(event_t event)
+void obstruksjonStoppEntry()
 {
-	switch(event)
-	{	
-	case(NOD_STOPP):
-	    tilstand2 = OBSTRUKSJON_STOPP;
-	    break;
-
-	case(OBSTRUKSJON_AV):
-	  klarEntry();
-	  tilstand2 = KLAR;
-	}
-}
-
-void apneState(event_t event)
-{
-  if(tilstand2 != KLAR)
-    return;
-
-	switch(event)
-	{
-	case(TIME_OUT):
-	  printf("hent neste ordre er %d \n\r", hentNesteOrdre(etasje, opp));
-	  if(hentNesteOrdre(etasje, opp) == -1)
-	    {
-	      tilstand1 = IDLE;
-	    } else if(hentNesteOrdre(etasje, opp) == etasje)
-	    {	
-	      slettOrdre(etasje, true);
-	      slettOrdre(etasje, false);
-	      apneState(TIME_OUT);
-	      } else 
-	      {
-		bevegerEntry();
-		tilstand1 = BEVEGER;
-	      }
-	
-	    break;
-	case(NY_ORDRE):
-	  if(hentNesteOrdre(etasje, opp) == etasje)
-	    {
-	      slettOrdre(etasje, opp);
-	      startTimer();	
-	    }
-	  //tilstand1 = APNE_DORER;
-	  
-	}
-
-
-	if(tilstand1 != APNE_DORER && tilstand1 != NODSTOPP)
-	  apen = false;
-}
-
-void stoppState(event_t event)
-{
-	switch(event)
-	{
-	case(NY_ORDRE):
-	
-	  if(finnestOrdreInniHeis() && !elev_get_stop_signal())
-	    {
-	      klarEntry();
-	      tilstand2 = KLAR;
-	    } else 
-	    {
-	      slettAlleOrdre();
-	    }
-	  break;
-	case(OBSTRUKSJON_PA):
-	  tilstand2 = OBSTRUKSJON_STOPP;
-	}
-
-	
-
-	if(tilstand2 != NODSTOPP && tilstand2 != OBSTRUKSJON_STOPP)
-	  elev_set_stop_lamp(false);
-
-
-}
-
-
-void obstruksjonStoppState(event_t event)
-{
-	switch(event)
-	{
-	case(NY_ORDRE):
-	
-	    if(finnestOrdreInniHeis() && !elev_get_stop_signal())
-		tilstand2 = OBSTRUKSJON;
-	    else
-	      slettAlleOrdre();
-
-	break;
-	case(OBSTRUKSJON_AV):
-	    tilstand2 = NODSTOPP;	
-	}
-
-	if(tilstand2 != NODSTOPP && tilstand2 != OBSTRUKSJON_STOPP)
-	  elev_set_stop_lamp(false);
+    slettAlleOrdre();
+    elev_set_stop_lamp(true);
+    tilstand2 = OBSTRUKSJON_STOPP;
 }
 
 void etasjeAnkommet(int e)
 {
-  etasje = e;
-  foo1(ETASJE_ANKOMMET);
+    etasje = e;
+    tilstandsMaskin1(ETASJE_ANKOMMET);
 }
 
 void nyOrdre()
 {
-    foo1(NY_ORDRE);
-    foo2(NY_ORDRE);
+    tilstandsMaskin1(NY_ORDRE);
+    tilstandsMaskin2(NY_ORDRE);
 }
 
 void obstruksjonPa()
 {
-    foo2(OBSTRUKSJON_PA);
+    tilstandsMaskin2(OBSTRUKSJON_PA);
 }
 
 void obstruksjonAv()
 {
-    foo2(OBSTRUKSJON_AV);
+    tilstandsMaskin2(OBSTRUKSJON_AV);
 }
 
 void nodStopp()
 {
-  slettAlleOrdre();
-  elev_set_stop_lamp(true);
-  foo2(NOD_STOPP);
+    tilstandsMaskin2(NOD_STOPP);
 }
 
 void timeOut()
 {
-  foo1(TIME_OUT);
+    tilstandsMaskin1(TIME_OUT);
 }
 
 void initHeisstyring()
 {
-  elev_set_speed(100);
+    elev_set_speed(100);
 }

@@ -1,10 +1,8 @@
 #include <time.h>
 #include <stdbool.h>
 
-
 clock_t startTime = 0;
 bool timedOut = true;
-
 
 bool harTimetUt()
 {
@@ -21,6 +19,5 @@ bool harTimetUt()
 void startTimer()
 {
   startTime = clock();
-  timedOut = false;
-  
+  timedOut = false;  
 }
